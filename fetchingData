@@ -1,0 +1,26 @@
+AlmofireResponse().getResponseBySendingBody(methodType: .post, urlString: loginURL, userInfo: userInfo, onCompletion: { (response, bool) in
+            let json = response as! [String:AnyObject]
+            print("JSON: \(json)")
+            let jsonData: NSDictionary = (json as? NSDictionary)!
+            
+            if let userObject = jsonData["object"] as? [String: AnyObject] {
+   //if data is in dictionary format
+            }
+                
+            else if let userObject =  jsonData["object"] as? NSArray{
+              
+            //if data is in array format
+       
+            }
+            else if let userObject = jsonData["error"] as? [String: AnyObject] {
+                if let message = userObject["message"] as? String{
+                    
+                    //     if error
+                    
+                }
+            }
+            else {
+                print("failed to get data")
+            }
+            
+        }, onCancelation: {})
