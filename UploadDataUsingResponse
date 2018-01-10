@@ -1,0 +1,50 @@
+import UIKit
+import Alamofire
+
+
+typealias CompletionHandlerBlock = (_ responceObject:AnyObject,_ status:Bool) -> Void
+typealias CancelBlock = () -> Void
+
+var  completionHandler:CompletionHandlerBlock?
+var CancelHandler:CancelBlock?
+
+class AlmofireResponse{
+    
+    func getResponseBySendingBody(methodType:HTTPMethod,urlString:String,userInfo:[String:Any]?,onCompletion fetchBlock:@escaping CompletionHandlerBlock , onCancelation cancel:@escaping CancelBlock){
+        completionHandler = fetchBlock
+        let url = URL(string: urlString)
+        var urlRequest = URLRequest(url: url!)
+        urlRequest.httpMethod = methodType.rawValue
+        var headers: HTTPHeaders
+        if let existingHeaders = urlRequest.allHTTPHeaderFields {
+            headers = existingHeaders
+        } else {
+            headers = HTTPHeaders()
+        }
+        headers["Accept"] = "application/json"
+        headers["Content-Type"] = "application/json"
+        urlRequest.allHTTPHeaderFields = headers
+        if let requestInfo = userInfo{
+            var requestData: Data!
+            do{
+                requestData = try JSONSerialization.data(withJSONObject: requestInfo, options:
+                    JSONSerialization.WritingOptions.prettyPrinted) as Data!
+                _ = NSString(data: requestData!,
+                             encoding: String.Encoding.ascii.rawValue)
+                urlRequest.httpBody = requestData
+            }catch{
+            }
+        }
+        Alamofire.request(urlRequest).responseJSON { response in
+            if let json = response.result.value {
+                print("JSON: \(json)")
+                completionHandler!(json as AnyObject,true)
+            }else{
+                print("Did not receive json")
+            }
+        }
+    }
+    
+    
+    
+}
